@@ -1,0 +1,16 @@
+import React from 'react';
+
+const Header: React.FC = () => {
+  return (
+    <header className="bg-slate-800/50 backdrop-blur-sm p-4 border-b border-slate-700 shadow-lg sticky top-0 z-10">
+      <h1 className="text-2xl font-bold text-center text-white flex items-center justify-center gap-3">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-400" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2.25c-5.376 0-9.75 4.374-9.75 9.75s4.374 9.75 9.75 9.75 9.75-4.374 9.75-9.75S17.376 2.25 12 2.25ZM9.663 17.51a.75.75 0 0 1-1.06-1.061l1.59-1.59a.75.75 0 1 1 1.06 1.06l-1.59 1.591Zm.99-3.48a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0Zm3.292-5.522a.75.75 0 0 1-1.061 0L11.295 8.85a.75.75 0 0 1 1.06-1.06l1.591 1.59a.75.75 0 0 1 0 1.06Z" />
+        </svg>
+        Gemini AI Chat
+      </h1>
+    </header>
+  );
+};
+
+export default Header;
