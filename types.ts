@@ -6,4 +6,5 @@ export enum MessageAuthor {
 export interface ChatMessage {
   author: MessageAuthor;
   text: string;
+  imageUrl?: string;
 }

@@ -35,7 +35,14 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = ({ message }) => {
         <div className={`flex items-start gap-3 w-full ${containerClasses}`}>
             {!isUser && <BotIcon />}
             <div className={`max-w-md lg:max-w-2xl px-4 py-3 rounded-lg shadow-md ${bubbleClasses}`}>
-                <p className="whitespace-pre-wrap">{message.text}</p>
+                 {message.imageUrl && (
+                    <img
+                        src={message.imageUrl}
+                        alt="User upload"
+                        className="rounded-lg mb-2 max-w-full h-auto"
+                    />
+                 )}
+                {message.text && <p className="whitespace-pre-wrap">{message.text}</p>}
             </div>
             {isUser && <UserIcon />}
         </div>

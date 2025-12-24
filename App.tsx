@@ -10,7 +10,7 @@ const App: React.FC = () => {
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([
     {
       author: MessageAuthor.BOT,
-      text: "Hello! I'm a Gemini-powered AI assistant. How can I help you today?",
+      text: "Hello! I'm Taim Ai, an AI assistant powered by Gemini. You can now send images along with your text. How can I help you today?",
     },
   ]);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,17 +22,17 @@ const App: React.FC = () => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatHistory]);
 
-  const handleSend = async (prompt: string) => {
+  const handleSend = async (prompt: string, imageUrl?: string) => {
     if (isLoading) return;
 
     setIsLoading(true);
     setError(null);
     
-    const userMessage: ChatMessage = { author: MessageAuthor.USER, text: prompt };
+    const userMessage: ChatMessage = { author: MessageAuthor.USER, text: prompt, imageUrl };
     setChatHistory(prev => [...prev, userMessage]);
 
     try {
-      const botResponseText = await runQuery(prompt);
+      const botResponseText = await runQuery(prompt, imageUrl);
       const botMessage: ChatMessage = { author: MessageAuthor.BOT, text: botResponseText };
       setChatHistory(prev => [...prev, botMessage]);
     } catch (e) {

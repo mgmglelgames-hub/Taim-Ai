@@ -9,12 +9,34 @@ const getAi = () => {
     return new GoogleGenAI({ apiKey: process.env.API_KEY });
 }
 
-export const runQuery = async (prompt: string): Promise<string> => {
+export const runQuery = async (prompt: string, imageUrl?: string): Promise<string> => {
   try {
     const ai = getAi();
+
+    let contents: any = prompt;
+
+    if (imageUrl) {
+        const mimeTypeMatch = imageUrl.match(/data:(.*);base64,/);
+        if (!mimeTypeMatch) {
+            throw new Error("Invalid image data URL.");
+        }
+        const mimeType = mimeTypeMatch[1];
+        const base64Data = imageUrl.split(',')[1];
+        
+        const imagePart = {
+            inlineData: {
+                data: base64Data,
+                mimeType,
+            },
+        };
+
+        contents = { parts: [{ text: prompt }, imagePart] };
+    }
+
+
     const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
-        contents: prompt,
+        contents: contents,
     });
     
     const text = response.text;
