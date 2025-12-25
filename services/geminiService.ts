@@ -16,8 +16,9 @@ export const runQuery = async (prompt: string, imageUrl?: string): Promise<strin
   
   try {
     const ai = getAi();
+    const model = imageUrl ? 'gemini-3-pro-image-preview' : 'gemini-3-flash-preview';
 
-    let contents: any = prompt;
+    let contents: any = { parts: [{ text: prompt }] };
 
     if (imageUrl) {
         const mimeTypeMatch = imageUrl.match(/data:(.*);base64,/);
@@ -34,13 +35,13 @@ export const runQuery = async (prompt: string, imageUrl?: string): Promise<strin
             },
         };
 
-        contents = { parts: [{ text: prompt }, imagePart] };
+        contents.parts.push(imagePart);
     }
 
 
     const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: contents,
+        model,
+        contents,
     });
     
     const text = response.text;
@@ -57,5 +58,28 @@ export const runQuery = async (prompt: string, imageUrl?: string): Promise<strin
         throw new Error(`Gemini API Error: ${error.message}`);
     }
     throw new Error("An unknown error occurred while contacting the Gemini API.");
+  }
+};
+
+export const generateChatTitle = async (userPrompt: string, botResponse: string): Promise<string> => {
+  try {
+    const ai = getAi();
+    const prompt = `Based on the following conversation, create a very short, concise title (max 5 words). Do not use quotes or special characters.
+    
+    User: "${userPrompt}"
+    AI: "${botResponse}"
+    
+    Title:`;
+
+    const response = await ai.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: prompt,
+    });
+    
+    const title = response.text?.trim().replace(/["']/g, "") || "Chat";
+    return title;
+  } catch (error) {
+    console.error("Title generation failed:", error);
+    return "New Chat"; // Fallback title
   }
 };

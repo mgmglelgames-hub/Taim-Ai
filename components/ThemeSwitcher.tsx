@@ -1,5 +1,6 @@
 import React from 'react';
-import { useTheme, Theme } from '../contexts/ThemeContext';
+import { useTheme } from '../contexts/ThemeContext';
+import { Theme } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const ThemeSwitcher: React.FC = () => {
