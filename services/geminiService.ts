@@ -10,6 +10,10 @@ const getAi = () => {
 }
 
 export const runQuery = async (prompt: string, imageUrl?: string): Promise<string> => {
+  if (prompt.trim().toLowerCase() === 'who created you') {
+    return "This AI assistant was developed by Taim Mohammed Elnzamy and is powered by Google Gemini.";
+  }
+  
   try {
     const ai = getAi();
 
