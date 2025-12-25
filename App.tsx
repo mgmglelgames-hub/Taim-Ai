@@ -5,19 +5,23 @@ import ChatInput from './components/ChatInput';
 import ChatMessageComponent from './components/ChatMessage';
 import LoadingSpinner from './components/LoadingSpinner';
 import ChatSidebar from './components/ChatSidebar';
+import SettingsModal from './components/SettingsModal';
 import { runQuery, generateChatTitle } from './services/geminiService';
 import { MessageAuthor, type ChatMessage, type Chat, type AppData, Theme } from './types';
 import { ThemeContext } from './contexts/ThemeContext';
+import { AnimationContext } from './contexts/AnimationContext';
 
 const STORAGE_KEY = 'taim-ai-data';
 
 const App: React.FC = () => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [theme, setTheme] = useState<Theme>(Theme.LIGHT);
+  const [animationsEnabled, setAnimationsEnabled] = useState(true);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [isSettingsModalOpen, setSettingsModalOpen] = useState(false);
 
   const isInitialized = useRef(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -50,17 +54,20 @@ const App: React.FC = () => {
         }
         
         setTheme(data.theme || defaultTheme);
+        setAnimationsEnabled(data.animationsEnabled ?? true);
 
       } else {
         setChats([initialChat]);
         setActiveChatId(initialChat.id);
         setTheme(defaultTheme);
+        setAnimationsEnabled(true);
       }
     } catch (e) {
       console.error("Failed to load data from localStorage", e);
       setChats([initialChat]);
       setActiveChatId(initialChat.id);
       setTheme(defaultTheme);
+      setAnimationsEnabled(true);
     }
     
     isInitialized.current = true;
@@ -70,12 +77,12 @@ const App: React.FC = () => {
   useEffect(() => {
     if (!isInitialized.current) return;
     try {
-        const data: AppData = { chats, theme };
+        const data: AppData = { chats, theme, animationsEnabled };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     } catch (e) {
         console.error("Failed to save data to localStorage", e);
     }
-  }, [chats, theme]);
+  }, [chats, theme, animationsEnabled]);
 
   // Effect for applying the theme class to the DOM
   useEffect(() => {
@@ -85,8 +92,8 @@ const App: React.FC = () => {
 
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [activeChat?.messages, isLoading]);
+    chatEndRef.current?.scrollIntoView({ behavior: animationsEnabled ? 'smooth' : 'auto' });
+  }, [activeChat?.messages, isLoading, animationsEnabled]);
 
   const handleNewChat = () => {
     const newChat: Chat = {
@@ -158,9 +165,14 @@ const App: React.FC = () => {
   const toggleTheme = () => {
     setTheme(prev => prev === Theme.LIGHT ? Theme.DARK : Theme.LIGHT);
   };
+  
+  const toggleAnimations = () => {
+      setAnimationsEnabled(prev => !prev);
+  }
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <AnimationContext.Provider value={{ animationsEnabled }}>
       <div className="flex h-screen bg-m3-light-surface-container-low dark:bg-m3-dark-surface-container-low text-m3-light-on-surface dark:text-m3-dark-on-surface transition-colors duration-300">
         <ChatSidebar 
           chats={chats}
@@ -168,11 +180,12 @@ const App: React.FC = () => {
           onNewChat={handleNewChat}
           onSelectChat={handleSelectChat}
           onDeleteChat={handleDeleteChat}
+          onOpenSettings={() => setSettingsModalOpen(true)}
           isOpen={isSidebarOpen}
           onClose={() => setSidebarOpen(false)}
         />
         <div className="flex flex-col flex-grow">
-          <Header onMenuClick={() => setSidebarOpen(o => !o)} />
+          <Header onMenuClick={() => setSidebarOpen(o => !o)} onOpenSettings={() => setSettingsModalOpen(true)} />
           <main className="flex-grow overflow-y-auto p-4 md:p-6">
             <div className="max-w-4xl mx-auto flex flex-col gap-4">
               <AnimatePresence>
@@ -204,7 +217,14 @@ const App: React.FC = () => {
             <ChatInput onSend={handleSend} isLoading={isLoading} />
           </div>
         </div>
+        <SettingsModal 
+            isOpen={isSettingsModalOpen}
+            onClose={() => setSettingsModalOpen(false)}
+            animationsEnabled={animationsEnabled}
+            onToggleAnimations={toggleAnimations}
+        />
       </div>
+    </AnimationContext.Provider>
     </ThemeContext.Provider>
   );
 };

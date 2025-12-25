@@ -2,9 +2,11 @@ import React from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { Theme } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAnimation } from '../contexts/AnimationContext';
 
 const ThemeSwitcher: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
+  const { animationsEnabled } = useAnimation();
 
   return (
     <button
@@ -18,7 +20,7 @@ const ThemeSwitcher: React.FC = () => {
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 20, opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: animationsEnabled ? 0.2 : 0 }}
         >
           {theme === Theme.LIGHT ? (
             // Moon Icon for switching to dark mode

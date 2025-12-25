@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { MessageAuthor, type ChatMessage } from '../types';
+import { useAnimation } from '../contexts/AnimationContext';
 
 interface ChatMessageProps {
   message: ChatMessage;
@@ -26,6 +27,7 @@ const BotIcon: React.FC = () => (
 );
 
 const ChatMessageComponent: React.FC<ChatMessageProps> = ({ message }) => {
+  const { animationsEnabled } = useAnimation();
   const isUser = message.author === MessageAuthor.USER;
   
   const bubbleClasses = isUser
@@ -39,10 +41,10 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = ({ message }) => {
   return (
     <motion.div 
       layout
-      initial={{ opacity: 0, y: 20, scale: 0.9 }}
+      initial={animationsEnabled ? { opacity: 0, y: 20, scale: 0.9 } : false}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, transition: { duration: 0.15 } }}
-      transition={{ duration: 0.3, ease: 'easeOut' }}
+      exit={{ opacity: 0, transition: { duration: animationsEnabled ? 0.15 : 0 } }}
+      transition={{ duration: animationsEnabled ? 0.3 : 0, ease: 'easeOut' }}
       className={`flex items-start gap-3 w-full`}
     >
         <div className={`flex items-start gap-3 w-full ${containerClasses}`}>

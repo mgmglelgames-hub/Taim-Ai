@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { type Chat } from '../types';
+import { useAnimation } from '../contexts/AnimationContext';
 
 interface ChatSidebarProps {
   chats: Chat[];
@@ -8,11 +9,13 @@ interface ChatSidebarProps {
   onNewChat: () => void;
   onSelectChat: (id: string) => void;
   onDeleteChat: (id: string) => void;
+  onOpenSettings: () => void;
   isOpen: boolean;
   onClose: () => void;
 }
 
-const ChatSidebar: React.FC<ChatSidebarProps> = ({ chats, activeChatId, onNewChat, onSelectChat, onDeleteChat, isOpen, onClose }) => {
+const ChatSidebar: React.FC<ChatSidebarProps> = ({ chats, activeChatId, onNewChat, onSelectChat, onDeleteChat, onOpenSettings, isOpen, onClose }) => {
+    const { animationsEnabled } = useAnimation();
     
     const sidebarVariants = {
         open: { x: 0 },
@@ -28,6 +31,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ chats, activeChatId, onNewCha
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
+                        transition={{ duration: animationsEnabled ? 0.2 : 0 }}
                         onClick={onClose}
                         className="fixed inset-0 bg-black/50 z-20 md:hidden"
                     />
@@ -37,7 +41,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ chats, activeChatId, onNewCha
             <motion.div
                 animate={isOpen ? 'open' : 'closed'}
                 variants={sidebarVariants}
-                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                transition={animationsEnabled ? { type: 'spring', stiffness: 300, damping: 30 } : { type: 'tween', duration: 0 }}
                 className="fixed md:static top-0 left-0 h-full bg-m3-light-surface-container dark:bg-m3-dark-surface-container w-72 flex-shrink-0 flex flex-col z-30 shadow-lg md:shadow-none"
             >
                 <div className="p-4 flex-shrink-0 border-b border-slate-500/10 dark:border-slate-500/20">
@@ -59,7 +63,8 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ chats, activeChatId, onNewCha
                             layout
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, x: -20, transition: {duration: 0.15} }}
+                            exit={{ opacity: 0, x: -20, transition: {duration: animationsEnabled ? 0.15 : 0} }}
+                            transition={{ duration: animationsEnabled ? 0.2 : 0 }}
                             className={`group flex items-center justify-between w-full text-left p-3 rounded-lg transition-colors duration-200 ${
                                 activeChatId === chat.id 
                                 ? 'bg-m3-light-primary/10 dark:bg-m3-dark-primary/10 text-m3-light-primary dark:text-m3-dark-primary' 
@@ -86,6 +91,17 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ chats, activeChatId, onNewCha
                         </motion.div>
                     ))}
                     </AnimatePresence>
+                </div>
+                <div className="p-2 border-t border-slate-500/10 dark:border-slate-500/20">
+                    <button 
+                        onClick={onOpenSettings}
+                        className="w-full flex items-center gap-3 text-left p-3 rounded-lg hover:bg-slate-500/5 dark:hover:bg-slate-500/10 text-m3-light-on-surface-variant dark:text-m3-dark-on-surface-variant transition-colors"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                        </svg>
+                        <span className="text-sm font-medium">Settings</span>
+                    </button>
                 </div>
             </motion.div>
         </>

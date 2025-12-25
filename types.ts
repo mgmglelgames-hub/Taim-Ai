@@ -23,4 +23,5 @@ export enum Theme {
 export interface AppData {
     chats: Chat[];
     theme: Theme;
+    animationsEnabled: boolean;
 }

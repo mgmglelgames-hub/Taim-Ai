@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAnimation } from '../contexts/AnimationContext';
 
 interface ChatInputProps {
   onSend: (prompt: string, imageUrl?: string) => void;
@@ -10,6 +11,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading }) => {
   const [prompt, setPrompt] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { animationsEnabled } = useAnimation();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -54,7 +56,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading }) => {
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.8 }}
-                        transition={{ duration: 0.2 }}
+                        transition={{ duration: animationsEnabled ? 0.2 : 0 }}
                         className="relative inline-block mb-2 ml-12"
                     >
                         <img src={imagePreview} alt="Image preview" className="rounded-lg h-24 w-auto" />
@@ -108,7 +110,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading }) => {
                             initial={{ opacity: 0, scale: 0.5 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.5 }}
-                            transition={{ duration: 0.2 }}
+                            transition={{ duration: animationsEnabled ? 0.2 : 0 }}
                         >
                             {isLoading ? (
                                 <div className="w-6 h-6 animate-spin rounded-full border-t-2 border-b-2 border-current"></div>
